@@ -31,9 +31,12 @@ use Test::More $] ge '5.008' ? ( tests=>2 )
 my ($tfh, $outfile) = tempfile(UNLINK=>1);
 close $tfh;
 
+my $fontfile = catfile($FindBin::Bin,updir,'lib','Badge','Simple','DejaVuSans.ttf');
+
 my $script = catfile($FindBin::Bin, updir, 'bin', 'badge');
 is system($^X, $script, qw/ --left Hello --right World!
-	--color yellow --out /, $outfile ), 0, 'run badge';
+	--color yellow --out /, $outfile, '--font', $fontfile ),
+	0, 'run badge';
 
 my $exp = XML::LibXML->load_xml(
 	location => catfile($FindBin::Bin, 'hello.svg'),

@@ -21,7 +21,7 @@ L<http://perldoc.perl.org/perlartistic.html>.
 =cut
 
 use FindBin;
-use File::Spec::Functions qw/catfile/;
+use File::Spec::Functions qw/catfile updir/;
 use XML::LibXML;
 
 use Test::More tests=>5;
@@ -32,11 +32,13 @@ BEGIN {
 }
 is $Badge::Simple::VERSION, '0.02', 'Badge::Simple version matches tests';
 
+my $fontfile = catfile($FindBin::Bin,updir,'lib','Badge','Simple','DejaVuSans.ttf');
+
 {
 	my $exp = XML::LibXML->load_xml(
 		location => catfile($FindBin::Bin, 'hello.svg'),
 		no_blanks=>1 );
-	my $got = badge( left => "Hello", right => "World!", color => "yellow" );
+	my $got = badge( left => "Hello", right => "World!", color => "yellow", font=>$fontfile );
 	is $got->toStringC14N(), $exp->toStringC14N(), 'hello.svg';
 }
 
@@ -44,7 +46,7 @@ is $Badge::Simple::VERSION, '0.02', 'Badge::Simple version matches tests';
 	my $exp = XML::LibXML->load_xml(
 		location => catfile($FindBin::Bin, 'cpt100.svg'),
 		no_blanks=>1 );
-	my $got = badge( left=>'CPAN Testers', right=>'100%', color=>'brightgreen' );
+	my $got = badge( left=>'CPAN Testers', right=>'100%', color=>'brightgreen', font=>$fontfile );
 	is $got->toStringC14N(), $exp->toStringC14N(), 'cpt100.svg';
 }
 
@@ -52,7 +54,7 @@ is $Badge::Simple::VERSION, '0.02', 'Badge::Simple version matches tests';
 	my $exp = XML::LibXML->load_xml(
 		location => catfile($FindBin::Bin, 'foo.svg'),
 		no_blanks=>1 );
-	my $got = badge( left=>'foo', right=>'bar', color=>'#e542f4' );
+	my $got = badge( left=>'foo', right=>'bar', color=>'#e542f4', font=>$fontfile );
 	is $got->toStringC14N(), $exp->toStringC14N(), 'foo.svg';
 }
 
