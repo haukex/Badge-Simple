@@ -1,0 +1,14 @@
+Changes
+lib/Badge/Simple.pm
+lib/Badge/Simple/DejaVuSans.ttf
+lib/Badge/Simple/DejaVuSans_LICENSE.txt
+LICENSE.txt
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/author.t
+t/badge-simple.t
+t/cpt100.svg
+t/foo.svg
+t/hello.svg
+t/perlcriticrc
