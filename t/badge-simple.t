@@ -22,6 +22,7 @@ L<http://perldoc.perl.org/perlartistic.html>.
 
 use FindBin;
 use File::Spec::Functions qw/catfile/;
+use XML::LibXML;
 
 use Test::More tests=>5;
 

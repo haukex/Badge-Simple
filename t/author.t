@@ -21,18 +21,22 @@ L<http://perldoc.perl.org/perlartistic.html>.
 =cut
 
 use FindBin;
-use File::Spec::Functions qw/catfile abs2rel catdir/;
+use File::Spec::Functions qw/ updir catfile abs2rel catdir /;
 use File::Glob 'bsd_glob';
 
 our (@PODFILES,@PERLFILES);
+our $BINFILE;
 BEGIN {
+	$BINFILE = catfile($FindBin::Bin,updir,qw/ bin badge /);
 	@PERLFILES = (
-		catfile($FindBin::Bin,qw/ .. lib Badge Simple.pm /),
+		catfile($FindBin::Bin,updir,qw/ lib Badge Simple.pm /),
 		bsd_glob("$FindBin::Bin/*.t"),
 		bsd_glob("$FindBin::Bin/*.pm"),
+		$BINFILE,
 	);
 	@PODFILES = (
-		catfile($FindBin::Bin,qw/ .. lib Badge Simple.pm /),
+		catfile($FindBin::Bin,updir,qw/ lib Badge Simple.pm /),
+		$BINFILE,
 	);
 }
 
@@ -54,7 +58,7 @@ for my $podfile (@PODFILES) {
 my @tasks;
 for my $file (@PERLFILES) {
 	critic_ok($file);
-	minimum_version_ok($file, '5.006');
+	minimum_version_ok($file, $file eq $BINFILE ? '5.008' : '5.006' );
 	open my $fh, '<', $file or die "$file: $!";  ## no critic (RequireCarping)
 	while (<$fh>) {
 		s/\A\s+|\s+\z//g;

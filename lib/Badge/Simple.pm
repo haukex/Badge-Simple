@@ -20,7 +20,7 @@ my $DEFAULT_FONT = eval {
 	my $fontf = catfile($mydir, 'Simple', 'DejaVuSans.ttf');
 	-e $fontf ? Imager::Font->new( file => $fontf ) : undef };
 
-my %COLORSCHEMES = ( blue => '#007ec6', brightgreen => '#4c1',
+our %COLORSCHEMES = ( blue => '#007ec6', brightgreen => '#4c1',
 	green => '#97CA00', lightgrey => '#9f9f9f', orange => '#fe7d37',
 	red => '#e05d44', yellow => '#dfb317', yellowgreen => '#a4a61d' );
 

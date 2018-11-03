@@ -37,6 +37,9 @@ WriteMakefile(
 			},
 		},
 	},
+	EXE_FILES => [
+		( $] ge '5.008' ? 'bin/badge' : () ),
+	],
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker'    => '6.64',
 	},
@@ -55,6 +58,7 @@ WriteMakefile(
 		# Perl core modules
 		'Test::More'             => '1.302096',
 		'FindBin'                => 0,
+		'File::Temp'             => 0,
 		'File::Glob'             => 0,
 		# note I haven't included modules needed for author tests here
 	},
