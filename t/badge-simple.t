@@ -30,7 +30,7 @@ BEGIN {
 	diag "This is Perl $] at $^X on $^O";
 	use_ok 'Badge::Simple', 'badge';
 }
-is $Badge::Simple::VERSION, '0.01', 'Badge::Simple version matches tests';
+is $Badge::Simple::VERSION, '0.02', 'Badge::Simple version matches tests';
 
 {
 	my $exp = XML::LibXML->load_xml(
