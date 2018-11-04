@@ -34,7 +34,7 @@ BEGIN {
 	diag "This is Perl $] at $^X on $^O";
 	use_ok 'Badge::Simple', 'badge';
 }
-is $Badge::Simple::VERSION, '0.03', 'Badge::Simple version matches tests';
+is $Badge::Simple::VERSION, '0.04', 'Badge::Simple version matches tests';
 
 my $fontfile = catfile($FindBin::Bin,updir,'lib','Badge','Simple','DejaVuSans.ttf');
 

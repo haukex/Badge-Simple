@@ -1,5 +1,41 @@
 #!/usr/bin/env perl
 use ExtUtils::MakeMaker 6.52;  # need >=6.52 for CONFIGURE_REQUIRES
+
+# http://cpanwiki.grango.org/wiki/CPANAuthorNotes
+# "How can I indicate that my distribution only works on a particular operating system?"
+# -> die or BAIL_OUT with "OS unsupported" ==> NA
+# "How can I stop getting FAIL reports for missing libraries or other non-Perl dependencies?"
+# -> exit(0) from Makefile.PL before Makefile is written ==> UNKNOWN
+
+use Imager ();  # is listed in CONFIGURE_REQUIRES below
+print "# Imager at $INC{'Imager.pm'}\n";
+print "# Imager::Font version $Imager::Font::VERSION\n";
+if ( my @available = grep { $Imager::formats{$_} } qw/ tt t1 w32 ft2 / )
+     { print "# Available Imager::Font formats are: ", join(', ', @available), "\n" }
+else { print "# WARNING: No known Imager::Font formats are available!\n" }
+if (not $Imager::formats{tt} || $Imager::formats{ft2} ) {
+	if ($ENV{BADGE_SIMPLE_IGNORE_FONTLIBS}) {
+		print "# Imager FreeType support is missing, but I am ignoring that because you told\n",
+		      "# me to by setting the environment variable BADGE_SIMPLE_IGNORE_FONTLIBS.\n";
+	}
+	else {
+		print <<'END_NOTICE';
+# ##### NOTICE: Imager FreeType Support Missing #####
+# This build of the Imager distribution does not have the FreeType 1.x (tt)
+# or FreeType 2.x (ft2) support enabled, most likely becuase these libraries
+# were not available or were disabled when the distribution was built. This
+# means the default font included with Badge::Simple cannot be loaded and the
+# module's tests will fail.
+# If you still want to build this module, for example if you want to use
+# a different font library or you plan to rebuild Imager, then you can ignore
+# this issue by setting the environment variable BADGE_SIMPLE_IGNORE_FONTLIBS
+# to a true value and running Makefile.PL again.
+# ##### BAILING OUT #####
+END_NOTICE
+		exit 0;
+	}
+}
+
 # and in CONFIGURE_REQUIRES, we require >=6.64 for TEST_REQUIRES
 WriteMakefile(
 	NAME           => 'Badge::Simple',
@@ -13,7 +49,7 @@ WriteMakefile(
 		provides     => {
 			'Badge::Simple' => {
 				file    => 'lib/Badge/Simple.pm',
-				version => '0.03',
+				version => '0.04',
 			},
 		},
 		resources    => {
@@ -42,6 +78,7 @@ WriteMakefile(
 	],
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker'    => '6.64',
+		'Imager'                 => '1.000',
 	},
 	PREREQ_PM      => {
 		# CPAN

@@ -1,6 +1,10 @@
 Revision history for the Perl distribution Badge-Simple.
 
-0.03	Sun, Nov  4 2018
+0.04	Sun, Nov  4 2018
+	- Don't attempt to build if FreeType support is missing
+	  (hopefully will fix the current CPAN Testers failures)
+
+0.03	Sun, Nov  4 2018	commit 48144be25787d407a584d6d7a09b28e565da0404
 	- Made error reporting during testing more verbose (this likely
 	  won't fix the CPAN Testers failures yet, but help diagnose them)
 

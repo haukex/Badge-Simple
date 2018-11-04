@@ -10,7 +10,7 @@ use XML::LibXML ();
 
 # For AUTHOR, COPYRIGHT, AND LICENSE see the bottom of this file
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/ badge /;
