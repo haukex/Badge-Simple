@@ -12,3 +12,8 @@ perl:
     - "5.10"
     - "5.8"
 #   - "5.6"  # not supported by Travis
+
+# override the default cpanm to see what it's up to
+install:
+    - cpanm --verbose --installdeps --notest .
+
