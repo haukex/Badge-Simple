@@ -149,6 +149,12 @@ your local copy of F<Verdana.ttf>. This font is currently I<only>
 used to calculate the width of the badge. If omitted, defaults to
 F<DejaVuSans.ttf>, which is distributed with this module.
 
+B<Note:> Different font libraries may calculate the widths of fonts
+slightly differently. This module's tests check to make sure that
+these variations are not too large (within a couple of pixels), but
+I<be aware> that badges generated on different systems might have
+slightly different widths.
+
 =back
 
 The return value of C<badge>, an
