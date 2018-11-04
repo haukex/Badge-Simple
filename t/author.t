@@ -41,7 +41,7 @@ BEGIN {
 }
 
 use Test::More $ENV{BADGE_SIMPLE_AUTHOR_TESTS}
-	? ( tests => @PODFILES + 2*@PERLFILES )
+	? ( tests => @PODFILES + 2*@PERLFILES + 1 )
 	: (skip_all=>'author tests (set $ENV{BADGE_SIMPLE_AUTHOR_TESTS} to enable)');
 
 use warnings FATAL=>'all';
@@ -50,6 +50,9 @@ use Carp::Always;
 use Test::Perl::Critic -profile=>catfile($FindBin::Bin,'perlcriticrc');
 use Test::MinimumVersion;
 use Test::Pod;
+use Test::DistManifest;
+
+subtest 'MANIFEST' => sub { manifest_ok() };
 
 for my $podfile (@PODFILES) {
 	pod_file_ok($podfile);
