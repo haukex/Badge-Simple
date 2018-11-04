@@ -53,18 +53,16 @@ sub badge {  ## no critic (RequireArgUnpacking)
 	
 	my $doc = XML::LibXML::Document->createDocument();
 	
-	my $root = $doc->createElementNS('http://www.w3.org/2000/svg', 'svg');
-	$doc->setDocumentElement($root);
-	$root->setAttribute(width => $total_w);
-	$root->setAttribute(height => 20);
-	
 	my $newel = sub {
 		my ($parent,$name,%atts) = @_;
-		my $el = $doc->createElement($name);
+		my $el = $doc->createElementNS('http://www.w3.org/2000/svg', $name);
 		$el->setAttribute($_=>$atts{$_}) for keys %atts;
-		$parent->appendChild($el);
+		$parent->appendChild($el) if defined($parent);
 		return $el;
 	};
+	
+	my $root = $newel->(undef, 'svg', width=>$total_w, height=>20);
+	$doc->setDocumentElement($root);
 	
 	my $lingrad = $newel->($root, 'linearGradient', id=>'smooth', x2=>'0', y2=>'100%' );
 	$newel->($lingrad, 'stop', offset=>'0', 'stop-color'=>'#bbb', 'stop-opacity'=>'.1' );
