@@ -22,9 +22,10 @@ L<http://perldoc.perl.org/perlartistic.html>.
 
 use FindBin;
 use File::Spec::Functions qw/catfile updir/;
+use File::Temp qw/tempfile/;
 use XML::LibXML;
 
-use Test::More tests=>5;
+use Test::More tests=>6;
 
 BEGIN {
 	diag "This is Perl $] at $^X on $^O";
@@ -57,4 +58,23 @@ my $fontfile = catfile($FindBin::Bin,updir,'lib','Badge','Simple','DejaVuSans.tt
 	my $got = badge( left=>'foo', right=>'bar', color=>'#e542f4', font=>$fontfile );
 	is $got->toStringC14N(), $exp->toStringC14N(), 'foo.svg';
 }
+
+subtest 'CLI' => sub {
+	plan $] ge '5.008' ? ( tests=>2 ) : ( skip_all=>'bin/badge requires perl 5.008' );
+	
+	my ($tfh, $outfile) = tempfile(UNLINK=>1);
+	close $tfh;
+	
+	my $script = catfile($FindBin::Bin, updir, 'bin', 'badge');
+	is system($^X, $script, qw/ --left Hello --right World!
+		--color yellow --out /, $outfile, '--font', $fontfile ),
+		0, 'bin/badge';
+	
+	my $exp = XML::LibXML->load_xml(
+		location => catfile($FindBin::Bin, 'hello.svg'),
+		no_blanks=>1 );
+	my $got = XML::LibXML->load_xml(
+		location => $outfile, no_blanks=>1 );
+	is $got->toStringC14N(), $exp->toStringC14N(), 'hello.svg';
+};
 
