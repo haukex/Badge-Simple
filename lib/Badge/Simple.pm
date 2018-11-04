@@ -186,7 +186,7 @@ C<< my $string = $svg->toString(1); >>
 =head2 Samples
 
 The following samples should be visible if you are viewing an HTML
-version of this documentation and you have an internet connection
+version of this documentation and you have an Internet connection
 available. Otherwise, please see the sample images in the F<t/>
 directory of the module distribution.
 
