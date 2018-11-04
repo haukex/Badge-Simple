@@ -112,7 +112,9 @@ Badge::Simple - Generate simple SVG badges
      ->toFile( "hello.svg" );
 
 =for html
-<div>&rarr; <samp>hello.svg</samp>: <img src="https://raw.githubusercontent.com/haukex/Badge-Simple/master/t/hello.svg?sanitize=true" /></div>
+<div>&rarr; <code>hello.svg</code>:
+<img src="https://raw.githubusercontent.com/haukex/Badge-Simple/master/t/hello.svg?sanitize=true"
+	alt="If this image doesn't display, see the samples in the 't' directory of this module's distribution." /></div>
 
 =head1 Description
 
@@ -151,11 +153,31 @@ F<DejaVuSans.ttf>, which is distributed with this module.
 
 =back
 
-To write the SVG to a file, use the C<< ->toFile($filename) >>
-method on the return value of the C<badge> function, or
-C<< ->toFile($filename, 1) >> to nicely indent the XML. To get the
-SVG as a string, use the C<< ->toString() >> method, or
-C<< ->toString(1) >> for indented XML.
+The return value of C<badge>, an
+L<XML::LibXML::Document|XML::LibXML::Document> object, can easily
+be used in one of the following ways (C<$svg> is the return value):
+
+=over
+
+=item *
+
+Write to a file: C<< $svg->toFile($filename); >>
+
+=item *
+
+Save to a string: C<< my $string = $svg->toString(); >>
+
+=item *
+
+Write to a file with the XML nicely indented:
+C<< $svg->toFile($filename, 1); >>
+
+=item *
+
+Save to a string with the XML nicely indented:
+C<< my $string = $svg->toString(1); >>
+
+=back
 
 =head2 Samples
 
