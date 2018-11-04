@@ -10,7 +10,7 @@ use XML::LibXML ();
 
 # For AUTHOR, COPYRIGHT, AND LICENSE see the bottom of this file
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/ badge /;
@@ -40,7 +40,7 @@ sub badge {  ## no critic (RequireArgUnpacking)
 	if (defined $args{font}) {
 		croak "badge: unable to find font file '$args{font}'" unless -e $args{font};
 		$font = Imager::Font->new( file => $args{font} )
-			or croak "badge: failed to load font '$args{font}'" }
+			or croak "badge: failed to load font '$args{font}': ".Imager->errstr }
 	else { $font = $DEFAULT_FONT or croak "badge: no font specified and failed to load default font" }
 	
 	my $l_txt_w = $font->bounding_box(size=>11, string=>$args{left} )->display_width;

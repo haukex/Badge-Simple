@@ -26,19 +26,26 @@ use File::Temp qw/tempfile/;
 use XML::LibXML ();
 use Imager ();
 
+## no critic (RequireCarping)
+
 use Test::More tests=>7;
 
 BEGIN {
 	diag "This is Perl $] at $^X on $^O";
 	use_ok 'Badge::Simple', 'badge';
 }
-is $Badge::Simple::VERSION, '0.02', 'Badge::Simple version matches tests';
+is $Badge::Simple::VERSION, '0.03', 'Badge::Simple version matches tests';
 
 my $fontfile = catfile($FindBin::Bin,updir,'lib','Badge','Simple','DejaVuSans.ttf');
 
 {
-	my $font = Imager::Font->new( file => $fontfile );
-	diag "Imager::Font version is $Imager::Font::VERSION, class is ", ref $font;
+	diag "Imager::Font version is $Imager::Font::VERSION, available formats are: ",
+		join(', ', grep { $Imager::formats{$_} } qw/ tt t1 w32 ft2 /);  ## no critic (ProhibitPackageVars)
+	die "Font file $fontfile doesn't exist" unless -e $fontfile;
+	diag "Attempting to load font ", explain $fontfile;
+	my $font = Imager::Font->new( file => $fontfile )
+		or die "failed to load font: ".Imager->errstr;
+	diag "Imager::Font class is ", ref $font;
 	for my $str ('foo','Yadda yadda','The quick brown fox jumps over the lazy dog.') {
 		diag "display_width of '$str' is ",$font->bounding_box(size=>11, string=>$str)->display_width;
 	}
@@ -159,7 +166,6 @@ sub is_svg_similar ($$;$) {  ## no critic (ProhibitSubroutinePrototypes)
 	};
 }
 
-## no critic (RequireCarping)
 sub pick_apart_svg {
 	my $dom = shift;
 	my $xpc = XML::LibXML::XPathContext->new($dom);

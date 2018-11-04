@@ -1,6 +1,10 @@
 Revision history for the Perl distribution Badge-Simple.
 
-0.02	Sun, Nov  4 2018
+0.03	Sun, Nov  4 2018
+	- Made error reporting during testing more verbose (this likely
+	  won't fix the CPAN Testers failures yet, but help diagnose them)
+
+0.02	Sun, Nov  4 2018	commit 66fe008465f9a9ddd687088dc1c376b8c9a9db4e
 	- Attempts to fix various CPAN Testers failures
 	- Fixed XML namespaces in generated XML document (Note: This
 	  issue did not affect ->toFile() or ->toString() usage)
