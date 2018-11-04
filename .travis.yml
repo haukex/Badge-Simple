@@ -18,6 +18,8 @@ before_install:
     - cpanm Imager
 
 # override the default cpanm to see what it's up to
-install:
-    - cpanm --verbose --installdeps --notest .
+# as per https://docs.travis-ci.com/user/languages/perl/ ,
+# the default is "cpanm --quiet --installdeps --notest ."
+#install:
+#    - cpanm --verbose --installdeps --notest .
 
