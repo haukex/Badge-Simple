@@ -1,4 +1,5 @@
 #!include_default
 ^MANIFEST\.SKIP$
-^\.git.*$
+(^|/)\.git.*$
 ^\.travis\.yml$
+^misc/scrape_cache/.*$
