@@ -10,14 +10,15 @@ use Regexp::Common qw/balanced delimited/;
 use JSON::MaybeXS ();
 use XML::LibXML ();
 use Data::Dump qw/dd/;
+$|++;
 
 # Badge-Simple 0.01 had a ton of CPAN Testers failures
 # This gets the reports and tries to figure out what's up
 
 my $VERBOSE = 0;
 
-my %tbl = ();
-sub analyze {
+my %tbl = (); # this is the output of the analyses
+sub analyze1 {
 	my $report = shift;
 	$tbl{total}++;
 	if ($report=~/\bbadge: no font specified and failed to load default font\b/)
@@ -40,9 +41,6 @@ sub analyze {
 			{ $tbl{'unknown failures'}{$report}++ }
 	}
 }
-sub done_analyzing {
-	dd \%tbl;
-}
 
 my $GET_CACHE = dir($FindBin::Bin,'scrape_cache'); # for sub get
 $GET_CACHE->mkpath(1);
@@ -55,26 +53,33 @@ $cpt_js =~ m{ \b var \s+ versions \s* = \s*
 	( $RE{balanced}{-parens=>'[]'} ) \s* (?: ; | \z ) }xms
 		or die $cpt_js;
 my $versions = $json->decode($1);
-my $version = $versions->[-1];
+$VERBOSE and dd $versions;
 
 $cpt_js =~ m{ \b var \s+ results \s* = \s*
 	( $RE{balanced}{-parens=>'{}'} ) \s* (?: ; | \z ) }xms
 		or die $cpt_js;
 my $reports = $json->decode($1);
 
-say "Getting FAIL reports for $version";
-for my $rep ( $reports->{$version}->@* ) {
-	next unless $rep->{status} eq 'FAIL';
-	my $url = URI->new('http://api.cpantesters.org/v3/report');
-	$url->path_segments( $url->path_segments, $rep->{guid} );
-	my $report = $json->decode( get($url,1)->slurp );
-	die "id mismatch?" unless $report->{id} eq $rep->{guid};
-	die "fail mismatch?" unless $report->{result}{grade} eq 'fail';
-	my @out_keys = keys $report->{result}{output}->%*;
-	die "unexpected keys: @out_keys" unless @out_keys==1
-		&& $out_keys[0] eq 'uncategorized';
-	analyze( $report->{result}{output}{uncategorized} );
+my @tasks = (
+	['Badge-Simple-0.01', 'FAIL', \&analyze1],
+);
+for my $task (@tasks) {
+	my ($version,$type,$callback) = @$task;
+	say "Getting $type reports for $version";
+	for my $rep ( $reports->{$version}->@* ) {
+		next unless $rep->{status} eq $type;
+		my $url = URI->new('http://api.cpantesters.org/v3/report');
+		$url->path_segments( $url->path_segments, $rep->{guid} );
+		my $report = $json->decode( get($url,1)->slurp );
+		die "id mismatch?" unless $report->{id} eq $rep->{guid};
+		die "$type mismatch?" unless $report->{result}{grade} eq lc $type;
+		my @out_keys = keys $report->{result}{output}->%*;
+		die "unexpected keys: @out_keys" unless @out_keys==1
+			&& $out_keys[0] eq 'uncategorized';
+		$callback->( $report->{result}{output}{uncategorized} );
+	}
 }
+dd \%tbl;
 
 sub get {
 	my ($url,$forcecache) = @_;
@@ -91,11 +96,10 @@ sub get {
 	else { die $status }
 	return $file;
 }
-done_analyzing();
 
 __END__
 
-Extract of "Getting FAIL reports for Badge-Simple-0.01"
+Extract of "Getting FAIL reports for Badge-Simple-0.01" as of 2018-11-10
   "svg_bad"          => { "cpt100.svg" => { "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"20\" width=\"131\"><linearGradient id=\"smooth\" x2=\"0\" y2=\"100%\"><stop offset=\"0\" stop-color=\"#bbb\" stop-opacity=\".1\"></stop><stop offset=\"1\" stop-opacity=\".1\"></stop></linearGradient><clipPath id=\"round\"><rect fill=\"#fff\" height=\"20\" rx=\"3\" width=\"131\"></rect></clipPath><g clip-path=\"url(#round)\"><rect fill=\"#555\" height=\"20\" width=\"89\"></rect><rect fill=\"#4c1\" height=\"20\" width=\"42\" x=\"89\"></rect><rect fill=\"url(#smooth)\" height=\"20\" width=\"131\"></rect></g><g fill=\"#fff\" font-family=\"DejaVu Sans,Verdana,Geneva,sans-serif\" font-size=\"11\" text-anchor=\"middle\"><text fill=\"#010101\" fill-opacity=\".3\" x=\"45.5\" y=\"15\">CPAN Testers</text><text x=\"45.5\" y=\"14\">CPAN Testers</text><text fill=\"#010101\" fill-opacity=\".3\" x=\"109\" y=\"15\">100%</text><text x=\"109\" y=\"14\">100%</text></g></svg>"     => 70,
                                             "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"20\" width=\"132\"><linearGradient id=\"smooth\" x2=\"0\" y2=\"100%\"><stop offset=\"0\" stop-color=\"#bbb\" stop-opacity=\".1\"></stop><stop offset=\"1\" stop-opacity=\".1\"></stop></linearGradient><clipPath id=\"round\"><rect fill=\"#fff\" height=\"20\" rx=\"3\" width=\"132\"></rect></clipPath><g clip-path=\"url(#round)\"><rect fill=\"#555\" height=\"20\" width=\"89\"></rect><rect fill=\"#4c1\" height=\"20\" width=\"43\" x=\"89\"></rect><rect fill=\"url(#smooth)\" height=\"20\" width=\"132\"></rect></g><g fill=\"#fff\" font-family=\"DejaVu Sans,Verdana,Geneva,sans-serif\" font-size=\"11\" text-anchor=\"middle\"><text fill=\"#010101\" fill-opacity=\".3\" x=\"45.5\" y=\"15\">CPAN Testers</text><text x=\"45.5\" y=\"14\">CPAN Testers</text><text fill=\"#010101\" fill-opacity=\".3\" x=\"109.5\" y=\"15\">100%</text><text x=\"109.5\" y=\"14\">100%</text></g></svg>" => 14, },
                           "foo.svg"    => { "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"20\" width=\"60\"><linearGradient id=\"smooth\" x2=\"0\" y2=\"100%\"><stop offset=\"0\" stop-color=\"#bbb\" stop-opacity=\".1\"></stop><stop offset=\"1\" stop-opacity=\".1\"></stop></linearGradient><clipPath id=\"round\"><rect fill=\"#fff\" height=\"20\" rx=\"3\" width=\"60\"></rect></clipPath><g clip-path=\"url(#round)\"><rect fill=\"#555\" height=\"20\" width=\"30\"></rect><rect fill=\"#e542f4\" height=\"20\" width=\"30\" x=\"30\"></rect><rect fill=\"url(#smooth)\" height=\"20\" width=\"60\"></rect></g><g fill=\"#fff\" font-family=\"DejaVu Sans,Verdana,Geneva,sans-serif\" font-size=\"11\" text-anchor=\"middle\"><text fill=\"#010101\" fill-opacity=\".3\" x=\"16\" y=\"15\">foo</text><text x=\"16\" y=\"14\">foo</text><text fill=\"#010101\" fill-opacity=\".3\" x=\"44\" y=\"15\">bar</text><text x=\"44\" y=\"14\">bar</text></g></svg>"     => 70,
