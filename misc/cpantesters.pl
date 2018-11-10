@@ -81,6 +81,7 @@ for my $dist (@dists) {
 }
 
 if (defined $KWALDIR) {
+	warn "Kwalitee SVG badges are now provided natively: https://cpants.cpanauthors.org/dist/Dist-Name.svg\n";
 	my $uri = "https://cpants.cpanauthors.org/author/HAUKEX.json";
 	my $resp = $http->get("$uri");
 	die "$uri: $$resp{status} $$resp{reason}" unless $resp->{success};
