@@ -41,6 +41,18 @@ sub analyze1 {
 			{ $tbl{'unknown failures'}{$report}++ }
 	}
 }
+sub analyze2 {
+	my $report = shift;
+	$tbl{total}++;
+	my $found=0;
+	while ( $report=~m{ ^ \h* \# \h* display_width\ of\ ($RE{delimited}{-delim=>"'"})\ is\ (\d+) \h* $ }msxg ) {
+		my ($str,$width) = ($1,$2);
+		s/\A'(.+)'\z/$1/ or die $_ for $str;
+		$tbl{$str}{$width}++;
+		$found++;
+	}
+	warn "Didn't find three matches, found $found" unless $found==3;
+}
 
 my $GET_CACHE = dir($FindBin::Bin,'scrape_cache'); # for sub get
 $GET_CACHE->mkpath(1);
@@ -61,7 +73,8 @@ $cpt_js =~ m{ \b var \s+ results \s* = \s*
 my $reports = $json->decode($1);
 
 my @tasks = (
-	['Badge-Simple-0.01', 'FAIL', \&analyze1],
+	#['Badge-Simple-0.01', 'FAIL', \&analyze1],
+	['Badge-Simple-0.04', 'PASS', \&analyze2],
 );
 for my $task (@tasks) {
 	my ($version,$type,$callback) = @$task;
@@ -109,4 +122,14 @@ Extract of "Getting FAIL reports for Badge-Simple-0.01" as of 2018-11-10
   "svg_expexted"     => { "cpt100.svg" =>   "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"20\" width=\"129\"><linearGradient id=\"smooth\" x2=\"0\" y2=\"100%\"><stop offset=\"0\" stop-color=\"#bbb\" stop-opacity=\".1\"></stop><stop offset=\"1\" stop-opacity=\".1\"></stop></linearGradient><clipPath id=\"round\"><rect fill=\"#fff\" height=\"20\" rx=\"3\" width=\"129\"></rect></clipPath><g clip-path=\"url(#round)\"><rect fill=\"#555\" height=\"20\" width=\"88\"></rect><rect fill=\"#4c1\" height=\"20\" width=\"41\" x=\"88\"></rect><rect fill=\"url(#smooth)\" height=\"20\" width=\"129\"></rect></g><g fill=\"#fff\" font-family=\"DejaVu Sans,Verdana,Geneva,sans-serif\" font-size=\"11\" text-anchor=\"middle\"><text fill=\"#010101\" fill-opacity=\".3\" x=\"45\" y=\"15\">CPAN Testers</text><text x=\"45\" y=\"14\">CPAN Testers</text><text fill=\"#010101\" fill-opacity=\".3\" x=\"107.5\" y=\"15\">100%</text><text x=\"107.5\" y=\"14\">100%</text></g></svg>",
                           "foo.svg"    =>   "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"20\" width=\"59\"><linearGradient id=\"smooth\" x2=\"0\" y2=\"100%\"><stop offset=\"0\" stop-color=\"#bbb\" stop-opacity=\".1\"></stop><stop offset=\"1\" stop-opacity=\".1\"></stop></linearGradient><clipPath id=\"round\"><rect fill=\"#fff\" height=\"20\" rx=\"3\" width=\"59\"></rect></clipPath><g clip-path=\"url(#round)\"><rect fill=\"#555\" height=\"20\" width=\"29\"></rect><rect fill=\"#e542f4\" height=\"20\" width=\"30\" x=\"29\"></rect><rect fill=\"url(#smooth)\" height=\"20\" width=\"59\"></rect></g><g fill=\"#fff\" font-family=\"DejaVu Sans,Verdana,Geneva,sans-serif\" font-size=\"11\" text-anchor=\"middle\"><text fill=\"#010101\" fill-opacity=\".3\" x=\"15.5\" y=\"15\">foo</text><text x=\"15.5\" y=\"14\">foo</text><text fill=\"#010101\" fill-opacity=\".3\" x=\"43\" y=\"15\">bar</text><text x=\"43\" y=\"14\">bar</text></g></svg>",
                           "hello.svg"  =>   "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"20\" width=\"83\"><linearGradient id=\"smooth\" x2=\"0\" y2=\"100%\"><stop offset=\"0\" stop-color=\"#bbb\" stop-opacity=\".1\"></stop><stop offset=\"1\" stop-opacity=\".1\"></stop></linearGradient><clipPath id=\"round\"><rect fill=\"#fff\" height=\"20\" rx=\"3\" width=\"83\"></rect></clipPath><g clip-path=\"url(#round)\"><rect fill=\"#555\" height=\"20\" width=\"38\"></rect><rect fill=\"#dfb317\" height=\"20\" width=\"45\" x=\"38\"></rect><rect fill=\"url(#smooth)\" height=\"20\" width=\"83\"></rect></g><g fill=\"#fff\" font-family=\"DejaVu Sans,Verdana,Geneva,sans-serif\" font-size=\"11\" text-anchor=\"middle\"><text fill=\"#010101\" fill-opacity=\".3\" x=\"20\" y=\"15\">Hello</text><text x=\"20\" y=\"14\">Hello</text><text fill=\"#010101\" fill-opacity=\".3\" x=\"59.5\" y=\"15\">World!</text><text x=\"59.5\" y=\"14\">World!</text></g></svg>", },
+
+Results of "Getting PASS reports for Badge-Simple-0.04" as of 2018-11-10
+{
+  "foo" => { 17 => 222, 18 => 147 },
+  "The quick brown fox jumps over the lazy dog." => { 256 => 222, 261 => 147 },
+  "total" => 369,
+  "Yadda yadda" => { 72 => 222, 73 => 9, 74 => 138 },
+}
+
+Analysis: x = smaller value, y = larger value (ignored 73 => 9)  ==>  y = 1,0166x + 0,7545 with R^2 = 1
 

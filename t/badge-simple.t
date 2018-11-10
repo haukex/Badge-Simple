@@ -174,7 +174,7 @@ sub is_svg_similar ($$;$) {  ## no critic (ProhibitSubroutinePrototypes)
 		is $got->{xml}, $exp->{xml}, 'NO exact match; cleaned XML matches';
 		for my $k (qw/ total_w l_w r_w l_txt_c r_txt_c /) {
 			my $delta = abs( $exp->{$k} - $got->{$k} );
-			my $max_err = $k eq 'total_w' ? 8 : 4; #TODO Later: Can we make these smaller?
+			my $max_err = $k eq 'total_w' ? 8 : 4; #TODO Later: Can we make these smaller? (see misc/scrape_cpantesters.pl for equation)
 			if ($exp->{$k}<100) # for lengths of <100 pixels, apply error to pixel count
 				{ ok $delta<=$max_err, "$k: exp $$exp{$k}, got $$got{$k}, delta $delta is <= ${max_err}px" }
 			else { # for lengths of >=100 pixels, apply error to percentage difference
