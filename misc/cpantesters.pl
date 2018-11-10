@@ -7,6 +7,7 @@ use HTTP::Tiny ();
 use JSON::MaybeXS qw/decode_json/;
 use File::Spec::Functions qw/curdir catfile/;
 use Badge::Simple qw/badge/;
+use File::Replace 'replace3';
 
 # Generate "CPAN Testers" badges for a CPAN author's modules
 
@@ -64,8 +65,10 @@ for my $dist (@dists) {
 		else                 { $color="red"         }
 	}
 	my $outfile = catfile($OUTDIR,"$$data{dist}.svg");
-	badge( left=>"CPAN Testers", right=>$text, color=>$color )
-		->toFile($outfile);
+	my (undef,$outfh,$repl) = replace3($outfile, perms=>0644, debug=>$DEBUG);
+	print {$outfh} badge( left=>"CPAN Testers", right=>$text, color=>$color )
+		->toString;
+	$repl->finish;
 	print STDERR "Wrote $outfile ($text $color)\n" unless $QUIET;
 }
 
