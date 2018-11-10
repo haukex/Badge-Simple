@@ -13,6 +13,7 @@ version information.
 
 [![Travis CI Build Status](https://travis-ci.org/haukex/Badge-Simple.svg)](https://travis-ci.org/haukex/Badge-Simple)
 [![Coverage Status](https://coveralls.io/repos/github/haukex/Badge-Simple/badge.svg)](https://coveralls.io/github/haukex/Badge-Simple)
+[![Kwalitee Score](https://badges.zero-g.net/kwalitee/Badge-Simple.svg)](https://cpants.cpanauthors.org/dist/Badge-Simple)
 [![CPAN Testers](https://badges.zero-g.net/cpantesters/Badge-Simple.svg)](http://matrix.cpantesters.org/?dist=Badge-Simple)
 
 Installation
