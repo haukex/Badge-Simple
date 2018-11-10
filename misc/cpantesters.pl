@@ -5,16 +5,19 @@ use Getopt::Std 'getopts';
 use URI ();
 use HTTP::Tiny ();
 use JSON::MaybeXS qw/decode_json/;
+use File::Spec::Functions qw/curdir catfile/;
 use Badge::Simple qw/badge/;
 
 # Generate "CPAN Testers" badges for a CPAN author's modules
 
-my $USAGE = "Usage: $0 [-vdq] CPANAUTHOR\n";
+my $USAGE = "Usage: $0 [-vdq] [-o OUTDIR] CPANAUTHOR\n";
 $Getopt::Std::STANDARD_HELP_VERSION=1;
-getopts('vdq', \my %opts) or die $USAGE;
+getopts('vdqo:', \my %opts) or die $USAGE;
 my $VERBOSE = !!$opts{v};
 my $DEBUG = !!$opts{d};
 my $QUIET = !!$opts{q};
+my $OUTDIR = defined($opts{o}) ? $opts{o} : curdir;
+die "not a directory: $OUTDIR" unless -d $OUTDIR;
 @ARGV==1 or die $USAGE;
 my $AUTHOR = uc $ARGV[0];
 
@@ -60,7 +63,7 @@ for my $dist (@dists) {
 		elsif ($percent>=50) { $color="yellow"      }
 		else                 { $color="red"         }
 	}
-	my $outfile = "$$data{dist}.svg";
+	my $outfile = catfile($OUTDIR,"$$data{dist}.svg");
 	badge( left=>"CPAN Testers", right=>$text, color=>$color )
 		->toFile($outfile);
 	print STDERR "Wrote $outfile ($text $color)\n" unless $QUIET;
