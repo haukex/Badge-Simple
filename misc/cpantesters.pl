@@ -59,10 +59,12 @@ for my $dist (@dists) {
 	my ($text,$color) = ("unknown","lightgrey");
 	if ($pass+$fail>=4) { # want a somewhat decent percentage
 		my $percent = int(100*$pass/($pass+$fail));
+		$percent = 1 if $percent<1 && $pass+$fail>0; # round up from 0%
 		$text = "$percent%";
-		if    ($percent>=90) { $color="brightgreen" }
-		elsif ($percent>=50) { $color="yellow"      }
-		else                 { $color="red"         }
+		if    ($percent>=100) { $color="brightgreen" }
+		elsif ($percent>=90)  { $color="green"       }
+		elsif ($percent>=50)  { $color="yellow"      }
+		else                  { $color="red"         }
 	}
 	my $outfile = catfile($OUTDIR,"$$data{dist}.svg");
 	my (undef,$outfh,$repl) = replace3($outfile, perms=>0644, debug=>$DEBUG);
