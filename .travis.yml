@@ -13,9 +13,13 @@ perl:
     - "5.8"
 #   - "5.6"  # not supported by Travis
 
-# Makefile.PL needs this
 before_install:
+    # Makefile.PL needs this
     - cpanm Imager
+    # coveralls.io support:
+    - cpanm --notest Devel::Cover::Report::Coveralls
+after_success:
+    - cover -test -coverage default,-pod -report coveralls
 
 # override the default cpanm to see what it's up to
 # as per https://docs.travis-ci.com/user/languages/perl/ ,
