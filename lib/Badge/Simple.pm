@@ -15,7 +15,7 @@ our $VERSION = '0.04';
 use Exporter 'import';
 our @EXPORT_OK = qw/ badge /;
 
-my $DEFAULT_FONT = eval {
+our $DEFAULT_FONT = eval {
 	my (undef,$mydir) = fileparse( $INC{'Badge/Simple.pm'} );
 	my $fontf = catfile($mydir, 'Simple', 'DejaVuSans.ttf');
 	-e $fontf ? Imager::Font->new( file => $fontf ) : undef };

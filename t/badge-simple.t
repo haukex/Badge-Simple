@@ -28,7 +28,7 @@ use Imager ();
 
 ## no critic (RequireCarping)
 
-use Test::More tests=>7;
+use Test::More tests=>8;
 
 BEGIN {
 	diag "This is Perl $] at $^X on $^O";
@@ -75,7 +75,7 @@ subtest 'is_svg_similar' => \&test_is_svg_similar;
 	my $exp = XML::LibXML->load_xml(
 		location => catfile($FindBin::Bin, 'foo.svg'),
 		no_blanks=>1 );
-	my $got = badge( left=>'foo', right=>'bar', color=>'#e542f4', font=>$fontfile );
+	my $got = badge( left=>'foo', right=>'bar', color=>'#e542f4', font=>$fontfile, style=>"flat" );
 	is_svg_similar $got, $exp, 'foo.svg';
 }
 
@@ -97,6 +97,25 @@ subtest 'CLI' => sub {
 		location => $outfile, no_blanks=>1 );
 	is_svg_similar $got, $exp, 'hello.svg';
 };
+
+sub exception (&) {  ## no critic (ProhibitSubroutinePrototypes)
+	return eval { shift->(); 1 } ? undef : ($@ || die "\$@ was false");
+}
+
+subtest 'errors' => sub {
+	like exception { badge("foo") }, qr/\bbad number of arguments\b/i, 'bad number of arguments';
+	like exception { badge(foo=>"bar") }, qr/\bunknown argument\b/i, 'unknown argument';
+	like exception { badge() }, qr/\bmust specify '(?:left|right)'/i, 'missing arguments';
+	like exception { badge(left=>"foo",right=>"bar",color=>"quz") }, qr/\bbad color\b/i, 'bad color name';
+	like exception { badge(left=>"foo",right=>"bar",color=>"#a") }, qr/\bbad color\b/i, 'bad hex color 1';
+	like exception { badge(left=>"foo",right=>"bar",color=>"#xyzabc") }, qr/\bbad color\b/i, 'bad hex color 2';
+	like exception { badge(left=>"foo",right=>"bar",style=>"foo") }, qr/\bbad style\b/i, 'bad style';
+	like exception { badge(left=>"foo",right=>"bar",font=>"this_file_shouldnt_exist") }, qr/\bunable to find font file\b/i, 'bad font';
+	like exception { badge(left=>"foo",right=>"bar",font=>$0) }, qr/\bfailed to load font\b/i, 'invalid font';
+	local $Badge::Simple::DEFAULT_FONT = undef;
+	like exception { badge(left=>"foo",right=>"bar") }, qr/\bno font specified and failed to load default font\b/i, 'no font at all';
+};
+badge(left=>"foo",right=>"bar"); # for now, this is just here to make code coverage happy (default color)
 
 =begin comment
 
