@@ -12,6 +12,7 @@ command `perldoc lib/Badge/Simple.pm`) and the file `Changes` for
 version information.
 
 [![Travis CI Build Status](https://travis-ci.org/haukex/Badge-Simple.svg)](https://travis-ci.org/haukex/Badge-Simple)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/haukex/Badge-Simple?svg=true)](https://ci.appveyor.com/project/haukex/badge-simple)
 [![Coverage Status](https://coveralls.io/repos/github/haukex/Badge-Simple/badge.svg)](https://coveralls.io/github/haukex/Badge-Simple)
 [![Kwalitee Score](https://cpants.cpanauthors.org/dist/Badge-Simple.svg)](https://cpants.cpanauthors.org/dist/Badge-Simple)
 [![CPAN Testers](https://badges.zero-g.net/cpantesters/Badge-Simple.svg)](http://matrix.cpantesters.org/?dist=Badge-Simple)
