@@ -86,6 +86,7 @@ subtest 'CLI' => sub {
 	close $tfh;
 	
 	my $script = catfile($FindBin::Bin, updir, 'bin', 'badge');
+	#TODO: should probably inspect STDOUT and STDERR here
 	is system($^X, $script, qw/ --left Hello --right World!
 		--color yellow --out /, $outfile, '--font', $fontfile ),
 		0, 'bin/badge';
