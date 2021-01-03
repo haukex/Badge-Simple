@@ -37,7 +37,8 @@ my @dists = do {
 	$uri->query_form({ q=>"author:$AUTHOR AND status:latest",
 		fields=>"distribution,version" });
 	my $resp = $http->get("$uri");
-	die "$uri: $$resp{status} $$resp{reason}" unless $resp->{success};
+	$$resp{success} or die "$uri: $$resp{status} "
+		.( $$resp{status}==599 ? $$resp{content} : $$resp{reason} );
 	print STDERR "$uri: $$resp{status} $$resp{reason}\n" if $VERBOSE;
 	my $data = decode_json($resp->{content});
 	$DEBUG and dd($data);
@@ -53,7 +54,8 @@ for my $dist (@dists) {
 	my $uri = URI->new('http://api.cpantesters.org/v3/release/dist');
 	$uri->path_segments( $uri->path_segments, $$dist[0], $$dist[1] );
 	my $resp = $http->get("$uri");
-	die "$uri: $$resp{status} $$resp{reason}" unless $resp->{success};
+	$$resp{success} or die "$uri: $$resp{status} "
+		.( $$resp{status}==599 ? $$resp{content} : $$resp{reason} );
 	print STDERR "$uri: $$resp{status} $$resp{reason}\n" if $VERBOSE;
 	my $data = decode_json($resp->{content});
 	$DEBUG and dd($data);
@@ -84,7 +86,8 @@ if (defined $KWALDIR) {
 	warn "Kwalitee SVG badges are now provided natively: https://cpants.cpanauthors.org/dist/Dist-Name.svg\n";
 	my $uri = "https://cpants.cpanauthors.org/author/HAUKEX.json";
 	my $resp = $http->get("$uri");
-	die "$uri: $$resp{status} $$resp{reason}" unless $resp->{success};
+	$$resp{success} or die "$uri: $$resp{status} "
+		.( $$resp{status}==599 ? $$resp{content} : $$resp{reason} );
 	print STDERR "$uri: $$resp{status} $$resp{reason}\n" if $VERBOSE;
 	my $data = decode_json($resp->{content});
 	$DEBUG and dd($data);
