@@ -15,12 +15,16 @@ perl:
     - "5.8"
 #   - "5.6"  # not supported by Travis
 
+# coveralls.io support:
 before_install:
     # Makefile.PL needs this
     - cpanm Imager
-    # coveralls.io support:
+    # versions >1.33 fail on Perl <5.10
+    - cpanm --notest Devel::Cover@1.33
     - cpanm --notest Devel::Cover::Report::Coveralls
 after_success:
+    # this will fail on Perl <5.10, but Travis doesn't report it as a failure
+    # (it's ok if it fails, we don't need coverage reports from every single version)
     - cover -test -coverage default,-pod -report coveralls
 
 # override the default cpanm to see what it's up to
