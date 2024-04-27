@@ -5,7 +5,7 @@ use re '/aa';
 use Getopt::Std 'getopts';
 use URI ();
 use HTTP::Tiny ();
-use JSON::MaybeXS qw/decode_json/;
+use JSON::PP qw/decode_json/;
 use File::Spec::Functions qw/curdir catfile splitdir/;
 use Badge::Simple qw/badge/;
 use File::Replace 'replace3';
