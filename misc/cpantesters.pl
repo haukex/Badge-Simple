@@ -14,8 +14,8 @@ $|=1;  # for better logging
 # Generate "CPAN Testers" badges for a CPAN author's modules
 # for an example usage see https://github.com/haukex/my-badges
 
-my $MAX_RETRYCOUNT = 10;
-my $RETRY_DELAY_S = 10;
+my $MAX_RETRYCOUNT = 12;
+my $RETRY_DELAY_S = 15;
 
 my $USAGE = "Usage: $0 [-vdq] [-o OUTDIR] [-h HTMLOUT] CPANAUTHOR\n";
 $Getopt::Std::STANDARD_HELP_VERSION=1;
@@ -87,7 +87,7 @@ for my $dist (@dists) {
 		my $msg = "$uri: $$resp{status} "
 			.( $$resp{status}==599 ? $$resp{content} : $$resp{reason} );
 		die $msg if ++$retrycount > $MAX_RETRYCOUNT;
-		warn "$msg, retrying in $RETRY_DELAY_S\n";
+		warn "$msg, retrying in ${RETRY_DELAY_S}s\n";
 		sleep $RETRY_DELAY_S;
 		$resp = $http->get("$uri");
 	}
