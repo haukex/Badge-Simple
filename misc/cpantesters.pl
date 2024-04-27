@@ -33,7 +33,7 @@ if ($DEBUG) { require Data::Dump; Data::Dump->import("dd") }
 my $http = HTTP::Tiny->new();
 
 my @dists = do {
-	my $uri = URI->new('http://fastapi.metacpan.org/v1/release/_search');
+	my $uri = URI->new('https://fastapi.metacpan.org/v1/release/_search');
 	$uri->query_form({ q=>"author:$AUTHOR AND status:latest",
 		fields=>"distribution,version" });
 	my $resp = $http->get("$uri");
@@ -51,9 +51,17 @@ die "Sorry, no hits for author $AUTHOR\n" unless @dists;
 for my $dist (@dists) {
 	$$dist[0]=~/\A[\w\-]+\z/ or die "bad dist: $$dist[0]";
 	$$dist[1]=~/\A[\w\-\.]+\z/ or die "bad version: $$dist[1]";
-	my $uri = URI->new('http://api.cpantesters.org/v3/release/dist');
+	my $uri = URI->new('https://api.cpantesters.org/v3/release/dist');
 	$uri->path_segments( $uri->path_segments, $$dist[0], $$dist[1] );
+	sleep 1;  # don't hit the API too hard
 	my $resp = $http->get("$uri");
+	if (!$$resp{success}) {
+		warn "$uri: $$resp{status} "
+			.( $$resp{status}==599 ? $$resp{content} : $$resp{reason} )
+			.", retrying in 10s\n";
+		sleep 10;
+		$resp = $http->get("$uri");
+	}
 	$$resp{success} or die "$uri: $$resp{status} "
 		.( $$resp{status}==599 ? $$resp{content} : $$resp{reason} );
 	print STDERR "$uri: $$resp{status} $$resp{reason}\n" if $VERBOSE;
