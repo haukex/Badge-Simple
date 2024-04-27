@@ -15,7 +15,7 @@ version information.
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/haukex/Badge-Simple?svg=true)](https://ci.appveyor.com/project/haukex/badge-simple)
 [![Coverage Status](https://coveralls.io/repos/github/haukex/Badge-Simple/badge.svg)](https://coveralls.io/github/haukex/Badge-Simple)
 [![Kwalitee Score](https://cpants.cpanauthors.org/dist/Badge-Simple.svg)](https://cpants.cpanauthors.org/dist/Badge-Simple)
-[![CPAN Testers](https://badges.zero-g.net/cpantesters/Badge-Simple.svg)](http://matrix.cpantesters.org/?dist=Badge-Simple)
+[![CPAN Testers](https://haukex.github.io/my-badges/Badge-Simple.svg)](http://matrix.cpantesters.org/?dist=Badge-Simple)
 
 Installation
 ------------
