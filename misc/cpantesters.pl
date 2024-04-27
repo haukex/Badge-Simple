@@ -9,8 +9,13 @@ use JSON::PP qw/decode_json/;
 use File::Spec::Functions qw/curdir catfile splitdir/;
 use Badge::Simple qw/badge/;
 use File::Replace 'replace3';
+$|=1;  # for better logging
 
 # Generate "CPAN Testers" badges for a CPAN author's modules
+# for an example usage see https://github.com/haukex/my-badges
+
+my $MAX_RETRYCOUNT = 10;
+my $RETRY_DELAY_S = 10;
 
 my $USAGE = "Usage: $0 [-vdq] [-o OUTDIR] [-h HTMLOUT] CPANAUTHOR\n";
 $Getopt::Std::STANDARD_HELP_VERSION=1;
@@ -75,17 +80,17 @@ for my $dist (@dists) {
 	$$dist[1]=~/\A[\w\-\.]+\z/ or die "bad version: $$dist[1]";
 	my $uri = URI->new('https://api.cpantesters.org/v3/release/dist');
 	$uri->path_segments( $uri->path_segments, $$dist[0], $$dist[1] );
-	sleep 1;  # don't hit the API too hard
+	sleep 2;  # don't hit the API too hard, it doesn't seem to like that
+	my $retrycount = 0;
 	my $resp = $http->get("$uri");
-	if (!$$resp{success}) {
-		warn "$uri: $$resp{status} "
-			.( $$resp{status}==599 ? $$resp{content} : $$resp{reason} )
-			.", retrying in 10s\n";
-		sleep 10;
+	while (!$$resp{success}) {
+		my $msg = "$uri: $$resp{status} "
+			.( $$resp{status}==599 ? $$resp{content} : $$resp{reason} );
+		die $msg if ++$retrycount > $MAX_RETRYCOUNT;
+		warn "$msg, retrying in $RETRY_DELAY_S\n";
+		sleep $RETRY_DELAY_S;
 		$resp = $http->get("$uri");
 	}
-	$$resp{success} or die "$uri: $$resp{status} "
-		.( $$resp{status}==599 ? $$resp{content} : $$resp{reason} );
 	print STDERR "$uri: $$resp{status} $$resp{reason}\n" if $VERBOSE;
 	my $data = decode_json($resp->{content});
 	$DEBUG and dd($data);
