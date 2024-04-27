@@ -45,13 +45,16 @@ my $http = HTTP::Tiny->new();
 my @dists = do {
 	my $uri = URI->new('https://fastapi.metacpan.org/v1/release/_search');
 	$uri->query_form({ q=>"author:$AUTHOR AND status:latest",
-		fields=>"distribution,version" });
+		fields=>"distribution,version", size=>5000 });
 	my $resp = $http->get("$uri");
 	$$resp{success} or die "$uri: $$resp{status} "
 		.( $$resp{status}==599 ? $$resp{content} : $$resp{reason} );
 	print STDERR "$uri: $$resp{status} $$resp{reason}\n" if $VERBOSE;
 	my $data = decode_json($resp->{content});
 	$DEBUG and dd($data);
+	warn "WARNING: Module list was truncated at ".@{$data->{hits}{hits}}
+		.", though ".$data->{hits}{total}." results are available.\n"
+		if $data->{hits}{total} != @{$data->{hits}{hits}};
 	sort { $$a[0] cmp $$b[0] }
 		map { [ $_->{fields}{distribution}, $_->{fields}{version} ] }
 		@{$data->{hits}{hits}};
