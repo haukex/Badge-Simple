@@ -16,10 +16,11 @@ $|=1;  # for better logging
 
 my $MAX_RETRYCOUNT = 12;
 my $RETRY_DELAY_S = 15;
+my $DEFAULT_DELAY_MS = 100;
 
-my $USAGE = "Usage: $0 [-vdq] [-o OUTDIR] [-h HTMLOUT] CPANAUTHOR\n";
+my $USAGE = "Usage: $0 [-vdq] [-i DELAY_MS] [-o OUTDIR] [-h HTMLOUT] CPANAUTHOR\n";
 $Getopt::Std::STANDARD_HELP_VERSION=1;
-getopts('vdqo:k:h:', \my %opts) or die $USAGE;
+getopts('vdqo:k:h:i:', \my %opts) or die $USAGE;
 my $VERBOSE = !!$opts{v};
 my $DEBUG = !!$opts{d};
 my $QUIET = !!$opts{q};
@@ -34,6 +35,8 @@ if ($opts{h}) {
 	$HTMLOUT = catfile($OUTDIR,$opts{h});
 	die "not a file: $HTMLOUT" if -e $HTMLOUT && !-f $HTMLOUT;
 }
+my $DELAY_MS = $opts{i} ? $opts{i} : $DEFAULT_DELAY_MS;
+die "invalid DELAY_MS" unless $DELAY_MS =~ /\A[0-9]+\z/;
 @ARGV==1 or die $USAGE;
 my $AUTHOR = uc $ARGV[0];
 die "bad author $AUTHOR" unless $AUTHOR=~/\A\w+\z/;
@@ -83,7 +86,7 @@ for my $dist (@dists) {
 	$$dist[1]=~/\A[\w\-\.]+\z/ or die "bad version: $$dist[1]";
 	my $uri = URI->new('https://api.cpantesters.org/v3/release/dist');
 	$uri->path_segments( $uri->path_segments, $$dist[0], $$dist[1] );
-	sleep 2;  # don't hit the API too hard, it doesn't seem to like that
+	sleep $DELAY_MS/1000;
 	my $retrycount = 0;
 	my $resp = $http->get("$uri");
 	while (!$$resp{success}) {
