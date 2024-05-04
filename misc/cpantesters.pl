@@ -35,7 +35,7 @@ if ($opts{h}) {
 	$HTMLOUT = catfile($OUTDIR,$opts{h});
 	die "not a file: $HTMLOUT" if -e $HTMLOUT && !-f $HTMLOUT;
 }
-my $DELAY_MS = $opts{i} ? $opts{i} : $DEFAULT_DELAY_MS;
+my $DELAY_MS = $opts{i} || $DEFAULT_DELAY_MS;
 die "invalid DELAY_MS" unless $DELAY_MS =~ /\A[0-9]+\z/;
 @ARGV==1 or die $USAGE;
 my $AUTHOR = uc $ARGV[0];
